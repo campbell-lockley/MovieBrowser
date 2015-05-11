@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MovieBrowser</string>
+    <string name="hello_world">Hello There</string>
+    <string name="action_browser">Browser</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_legal">Legal Notices</string>
+    <string-array name="view_list">
+        <item>In Theatres</item>
+        <item>Opening</item>
+    </string-array>
+</resources>
