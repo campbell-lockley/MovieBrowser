@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/movie_details_title"
+            android:text="@string/default_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:typeface="serif"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/movie_details_star_1"
+                android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+                android:layout_width="32dp"
+                android:layout_height="32dp" />
+
+            <ImageView
+                android:id="@+id/movie_details_star_2"
+                android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+                android:layout_width="32dp"
+                android:layout_height="32dp" />
+
+            <ImageView
+                android:id="@+id/movie_details_star_3"
+                android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+                android:layout_width="32dp"
+                android:layout_height="32dp" />
+
+            <ImageView
+                android:id="@+id/movie_details_star_4"
+                android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+                android:layout_width="32dp"
+                android:layout_height="32dp" />
+
+            <ImageView
+                android:id="@+id/movie_details_star_5"
+                android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+                android:layout_width="32dp"
+                android:layout_height="32dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/movie_details_mpaa"
+            android:text="@string/default_mpaa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:textSize="16dp"
+            android:typeface="sans"/>
+
+        <TextView
+            android:id="@+id/movie_details_description"
+            android:text="@string/default_description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:typeface="sans"/>
+
+    </LinearLayout>
+
+</ScrollView>

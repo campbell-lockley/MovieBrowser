@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/activated"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/movie_thumbnail"
+        android:src="@drawable/ic_launcher"
+        android:layout_width="48dip"
+        android:layout_height="60dip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="8dip"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/movie_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/movie_thumbnail"
+        android:layout_toRightOf="@+id/movie_thumbnail"
+        android:textStyle="bold"
+        android:typeface="sans"/>
+
+    <TextView
+        android:id="@+id/movie_mpaa"
+        android:text="MPAA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/movie_thumbnail"
+        android:layout_below="@+id/movie_title"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/movie_thumbnail"
+        android:layout_below="@+id/movie_mpaa">
+
+        <ImageView
+            android:id="@+id/movie_star_1"
+            android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            android:layout_width="16dp"
+            android:layout_height="16dp" />
+
+        <ImageView
+            android:id="@+id/movie_star_2"
+            android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            android:layout_width="16dp"
+            android:layout_height="16dp" />
+
+        <ImageView
+            android:id="@+id/movie_star_3"
+            android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            android:layout_width="16dp"
+            android:layout_height="16dp" />
+
+        <ImageView
+            android:id="@+id/movie_star_4"
+            android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            android:layout_width="16dp"
+            android:layout_height="16dp" />
+
+        <ImageView
+            android:id="@+id/movie_star_5"
+            android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            android:layout_width="16dp"
+            android:layout_height="16dp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

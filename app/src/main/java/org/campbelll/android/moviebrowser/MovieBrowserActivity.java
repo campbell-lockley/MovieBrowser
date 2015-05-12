@@ -1,5 +1,6 @@
 package org.campbelll.android.moviebrowser;
 
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -13,9 +14,20 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 
-public class MovieBrowserActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener {
+public class MovieBrowserActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, MovieSelectionListener {
 
     private static final String TAG = "MovieBrowserActivity";
+
+    @Override
+    public void onMovieSelected(Movie movie) {
+        Log.d(TAG, "onMovieSelected");
+        MovieDetailsFragment movieDetailsFragment = (MovieDetailsFragment)getFragmentManager().findFragmentByTag("MovieDetailsFragment");
+        movieDetailsFragment.setContent(movie);
+
+        // Show details fragment
+        SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout)findViewById(R.id.sliding_layout);
+        slidingPaneLayout.closePane();
+    }
 
     // onNavigationListener to handle the navigation list selections
     @Override
@@ -36,6 +48,12 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_browser);
 
+        // Start with list fragment showing
+        SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout)findViewById(R.id.sliding_layout);
+        slidingPaneLayout.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
+        slidingPaneLayout.setPanelSlideListener(new SlideListener());
+        slidingPaneLayout.openPane();
+
         setupActionBar();
     }
 
@@ -54,8 +72,9 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         // Display icon and disable title
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setIcon(R.drawable.ic_launcher);
+        actionBar.setHomeButtonEnabled(false);
         actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);
 
         // Populate navigation list
         Spinner view_list = (Spinner)findViewById(R.id.nav_list_spinner);
@@ -80,6 +99,10 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
+            case android.R.id.home:
+                SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout)findViewById(R.id.sliding_layout);
+                if (!slidingPaneLayout.isOpen()) slidingPaneLayout.openPane();
+                return true;
             case R.id.action_browser:
                 Log.d(TAG, "Browser selected");
                 Toast.makeText(getApplicationContext(), "Browser Selected", Toast.LENGTH_SHORT).show();
@@ -94,6 +117,30 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout) findViewById(R.id.sliding_layout);
+        if (slidingPaneLayout.isOpen()) {
+            super.onBackPressed();
+        } else {
+            slidingPaneLayout.openPane();
+        }
+    }
+
+    private class SlideListener extends SlidingPaneLayout.SimplePanelSlideListener {
+        @Override
+        public void onPanelOpened(View panel) {
+            getSupportActionBar().setHomeButtonEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+
+        @Override
+        public void onPanelClosed(View panel) {
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 }
