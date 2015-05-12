@@ -4,16 +4,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 
@@ -51,20 +47,9 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
     private void setupActionBar() {
         final ActionBar actionBar = getSupportActionBar();
 
-        // Use drop-down navigation
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-//        SpinnerAdapter view_list_adapter = ArrayAdapter.createFromResource(this, R.array.view_list,
-//                android.R.layout.simple_spinner_dropdown_item);
-//        actionBar.setListNavigationCallbacks(view_list_adapter, this);
-//
-//        getSupportActionBar().setSelectedNavigationItem(nav_list_selected);
-
         // Use custom menu
-        ViewGroup v = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.actionbar_top, null);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM, ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(v, new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
-                ActionBar.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER_VERTICAL | Gravity.RIGHT));
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.action_bar);
 
         // Display icon and disable title
         actionBar.setDisplayShowTitleEnabled(false);

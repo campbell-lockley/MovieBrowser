@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_alignParentRight="true"
+    android:layout_height="wrap_content"
+    android:gravity="left">
     
     <Spinner
         android:id="@+id/nav_list_spinner"
@@ -9,17 +12,13 @@
         android:layout_height="wrap_content">
     </Spinner>
 
-    <!--<TextView-->
-        <!--android:text="@string/hello_world"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_weight=".5"-->
-        <!--android:layout_height="wrap_content" />-->
-
     <!--<ImageView-->
         <!--android:id="@+id/action_browser"-->
         <!--android:src="@drawable/ic_web"-->
         <!--android:layout_width="wrap_content"-->
+        <!--android:layout_weight="0"-->
         <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="center_vertical|end"-->
         <!--android:layout_marginTop="8dp"-->
         <!--android:layout_marginBottom="8dp"/>-->
 </LinearLayout>
