@@ -6,7 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <!--<ImageView-->
+        <!--android:id="@+id/movie_thumbnail"-->
+        <!--android:src="@drawable/ic_launcher"-->
+        <!--android:layout_width="48dip"-->
+        <!--android:layout_height="60dip"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_marginRight="8dip"-->
+        <!--android:contentDescription="@null"-->
+        <!--android:scaleType="fitCenter" />-->
+
+    <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/movie_thumbnail"
         android:src="@drawable/ic_launcher"
         android:layout_width="48dip"
@@ -18,57 +28,61 @@
 
     <TextView
         android:id="@+id/movie_title"
+        android:text="@string/default_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/movie_thumbnail"
         android:layout_toRightOf="@+id/movie_thumbnail"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:typeface="sans"/>
 
-    <TextView
-        android:id="@+id/movie_mpaa"
-        android:text="MPAA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/movie_thumbnail"
-        android:layout_below="@+id/movie_title"/>
+    <!--<TextView-->
+        <!--android:id="@+id/movie_mpaa"-->
+        <!--android:text="@string/default_mpaa"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_toRightOf="@+id/movie_thumbnail"-->
+        <!--android:layout_above="@+id/movie_stars"-->
+        <!--android:layout_below="@+id/movie_title"/>-->
 
     <LinearLayout
+        android:id="@+id/movie_stars"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/movie_thumbnail"
-        android:layout_below="@+id/movie_mpaa">
+        android:layout_below="@+id/movie_title">
 
         <ImageView
             android:id="@+id/movie_star_1"
             android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
-            android:layout_width="16dp"
-            android:layout_height="16dp" />
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
 
         <ImageView
             android:id="@+id/movie_star_2"
             android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
-            android:layout_width="16dp"
-            android:layout_height="16dp" />
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
 
         <ImageView
             android:id="@+id/movie_star_3"
             android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
-            android:layout_width="16dp"
-            android:layout_height="16dp" />
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
 
         <ImageView
             android:id="@+id/movie_star_4"
             android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
-            android:layout_width="16dp"
-            android:layout_height="16dp" />
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
 
         <ImageView
             android:id="@+id/movie_star_5"
             android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
-            android:layout_width="16dp"
-            android:layout_height="16dp" />
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
 
     </LinearLayout>
 

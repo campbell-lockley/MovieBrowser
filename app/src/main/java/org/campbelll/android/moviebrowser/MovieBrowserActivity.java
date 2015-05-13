@@ -1,9 +1,11 @@
 package org.campbelll.android.moviebrowser;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.os.Bundle;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,16 +15,50 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
 
-public class MovieBrowserActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, MovieSelectionListener {
+import org.json.JSONObject;
 
+
+public class MovieBrowserActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, MovieSelectionListener, TMDBResponseListener {
+    // Tags for this activity and its fragments
     private static final String TAG = "MovieBrowserActivity";
+    private static final String TMDB_CLIENT_FRAGMENT_TAG = "TMDBClientFragment";
+    private static final String MOVIE_DETAILS_FRAGMENT_TAG = "MovieDetailsFragment";
+    private static final String MOVIE_LIST_FRAGMENT_TAG = "MovieListFragment";
+
+    private static final int NO_INDEX = -1;
+
+    // Keeps track of selected nav list item for MovieListFragment's sake
+    private int selected_nav_index = NO_INDEX;
+    private boolean nav_list_changed = false;
+
+    private FragmentManager fragmentManager;
+
+    private TMDBClientFragment tmdbClientFragment;
+
+    @Override
+    public void onTMDBListResponse(JSONObject jsonObject) {
+        MovieListFragment movieListFragment = (MovieListFragment)fragmentManager.findFragmentByTag(MOVIE_LIST_FRAGMENT_TAG);
+        if (movieListFragment != null) {
+            movieListFragment.update(JSONParser.parseMovieListJSON(jsonObject), nav_list_changed);
+        }
+    }
+
+    @Override
+    public void onTMDBDetailsResponse(JSONObject jsonObject) {
+        MovieDetailsFragment movieDetailsFragment = (MovieDetailsFragment)fragmentManager.findFragmentByTag(MOVIE_DETAILS_FRAGMENT_TAG);
+        if (movieDetailsFragment != null) {
+            movieDetailsFragment.setMovieOverview(JSONParser.parseMovieOverviewJSON(jsonObject));
+        }
+    }
 
     @Override
     public void onMovieSelected(Movie movie) {
         Log.d(TAG, "onMovieSelected");
-        MovieDetailsFragment movieDetailsFragment = (MovieDetailsFragment)getFragmentManager().findFragmentByTag("MovieDetailsFragment");
+        MovieDetailsFragment movieDetailsFragment = (MovieDetailsFragment)getFragmentManager().findFragmentByTag(MOVIE_DETAILS_FRAGMENT_TAG);
         movieDetailsFragment.setContent(movie);
+        tmdbClientFragment.getMovieOverview(movie.id);
 
         // Show details fragment
         SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout)findViewById(R.id.sliding_layout);
@@ -35,7 +71,30 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         String[] view_list = getResources().getStringArray(R.array.view_list);
         String selected = view_list[position];
         Log.d(TAG, selected + " selected");
-        Toast.makeText(getApplicationContext(), "Displaying " + selected, Toast.LENGTH_SHORT).show();
+
+        nav_list_changed = (selected_nav_index != position);
+        selected_nav_index = position;
+
+        // Fill list with items from api
+        tmdbClientFragment.getMovieList(selected);
+
+        // If sliding layout is showing MovieDetailsFragment, show MovieListAdapter
+        SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout)findViewById(R.id.sliding_layout);
+        if (!slidingPaneLayout.isOpen()) slidingPaneLayout.openPane();
+
+        // Set MovieListFragment to show loading
+        MovieListFragment movieListFragment = (MovieListFragment)fragmentManager.findFragmentByTag(MOVIE_LIST_FRAGMENT_TAG);
+        if (movieListFragment != null) {
+            movieListFragment.setListShown(false);
+        }
+
+        // Clear MovieDetailsFragment
+        if (nav_list_changed) {
+            MovieDetailsFragment movieDetailsFragment = (MovieDetailsFragment) fragmentManager.findFragmentByTag(MOVIE_DETAILS_FRAGMENT_TAG);
+            if (movieDetailsFragment != null) {
+                movieDetailsFragment.clear();
+            }
+        }
     }
 
     @Override
@@ -51,14 +110,33 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         // Start with list fragment showing
         SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout)findViewById(R.id.sliding_layout);
         slidingPaneLayout.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
-        slidingPaneLayout.setPanelSlideListener(new SlideListener());
+        slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.SimplePanelSlideListener() {
+            @Override
+            public void onPanelOpened(View panel) {
+                getSupportActionBar().setHomeButtonEnabled(false);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            }
+
+            @Override
+            public void onPanelClosed(View panel) {
+                getSupportActionBar().setHomeButtonEnabled(true);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        });
         slidingPaneLayout.openPane();
+
+        addNonUIFragments();
+
+        if (savedInstanceState != null) {
+            selected_nav_index = savedInstanceState.getInt("selected_nav_index");
+        }
 
         setupActionBar();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("selected_nav_index", selected_nav_index);
         super.onSaveInstanceState(outState);
     }
 
@@ -85,11 +163,25 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         view_list.setOnItemSelectedListener(this);
     }
 
+    private void addNonUIFragments() {
+        fragmentManager = getFragmentManager();
+
+        // Add TMDBClientFragment if it doesn't exist
+        tmdbClientFragment = (TMDBClientFragment)fragmentManager.findFragmentByTag(TMDB_CLIENT_FRAGMENT_TAG);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        if (tmdbClientFragment == null) {
+            tmdbClientFragment = new TMDBClientFragment();
+            ft.add(tmdbClientFragment, TMDB_CLIENT_FRAGMENT_TAG);
+        }
+
+        ft.commit();
+        fragmentManager.executePendingTransactions();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_movie_browser, menu);
-
         return true;
     }
 
@@ -120,6 +212,16 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         }
     }
 
+    // make sure all pending network requests are cancelled when this activity stops
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
+        if (tmdbClientFragment != null) {
+            tmdbClientFragment.cancelAllRequests();
+        }
+    }
+
     @Override
     public void onBackPressed() {
         SlidingPaneLayout slidingPaneLayout = (SlidingPaneLayout) findViewById(R.id.sliding_layout);
@@ -130,17 +232,7 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         }
     }
 
-    private class SlideListener extends SlidingPaneLayout.SimplePanelSlideListener {
-        @Override
-        public void onPanelOpened(View panel) {
-            getSupportActionBar().setHomeButtonEnabled(false);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        }
-
-        @Override
-        public void onPanelClosed(View panel) {
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+    public ImageLoader getImageLoader() {
+        return tmdbClientFragment.getImageLoader();
     }
 }

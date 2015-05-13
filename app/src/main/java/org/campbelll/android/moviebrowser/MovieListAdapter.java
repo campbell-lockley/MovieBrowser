@@ -1,12 +1,15 @@
 package org.campbelll.android.moviebrowser;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.content.Context;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 
 import java.util.List;
 
@@ -15,10 +18,12 @@ import java.util.List;
  */
 public class MovieListAdapter extends ArrayAdapter<Movie> {
     private LayoutInflater layout_inflater;
+    private ImageLoader imageLoader;
 
-    public MovieListAdapter(Context context, int item_layout_id, int default_text_id, List<Movie> movies) {
+    public MovieListAdapter(Context context, int item_layout_id, int default_text_id, List<Movie> movies, ImageLoader imageLoader) {
         super(context, item_layout_id, default_text_id, movies);
         layout_inflater = LayoutInflater.from(context);
+        this.imageLoader = imageLoader;
     }
 
     @Override
@@ -27,9 +32,9 @@ public class MovieListAdapter extends ArrayAdapter<Movie> {
         if (convertView == null) {
             convertView = layout_inflater.inflate(R.layout.movie_list_item, null);
             holder = new ViewHolder();
-            //TODO: add thumbnail
             holder.title = (TextView)convertView.findViewById(R.id.movie_title);
-            holder.mpaa = (TextView)convertView.findViewById(R.id.movie_mpaa);
+            holder.thumbnail = (NetworkImageView)convertView.findViewById(R.id.movie_thumbnail);
+//            holder.mpaa = (TextView)convertView.findViewById(R.id.movie_mpaa);
             holder.star_1 = (ImageView)convertView.findViewById(R.id.movie_star_1);
             holder.star_2 = (ImageView)convertView.findViewById(R.id.movie_star_2);
             holder.star_3 = (ImageView)convertView.findViewById(R.id.movie_star_3);
@@ -41,7 +46,9 @@ public class MovieListAdapter extends ArrayAdapter<Movie> {
         }
         Movie movie = this.getItem(position);
         holder.title.setText(movie.title);
-        holder.mpaa.setText(movie.mpaa);// Clear image representation of rating
+        holder.thumbnail.setImageUrl(movie.thumb_url, imageLoader);
+//        holder.mpaa.setText(movie.mpaa);
+        // Clear image representation of rating
         switch (movie.rating) {
             case 0:
                 holder.star_1.setImageResource(R.drawable.abc_btn_rating_star_off_mtrl_alpha);
@@ -73,7 +80,8 @@ public class MovieListAdapter extends ArrayAdapter<Movie> {
 
     static class ViewHolder {
         TextView title;
-        TextView mpaa;
+        NetworkImageView thumbnail;
+//        TextView mpaa;
         ImageView star_1;
         ImageView star_2;
         ImageView star_3;

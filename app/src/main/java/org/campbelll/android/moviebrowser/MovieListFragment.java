@@ -2,12 +2,9 @@ package org.campbelll.android.moviebrowser;
 
 import android.app.Activity;
 import android.app.ListFragment;
-import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -21,10 +18,12 @@ public class MovieListFragment extends ListFragment {
 
     private MovieSelectionListener movie_selection_listener;
 
-    private int selected_index;
+    private int selected_index = NO_INDEX;
 
-    private ArrayList<Movie> demo_list;
-    private MovieListAdapter demo_adapter;
+    private ArrayList<Movie> movie_list = new ArrayList<>();
+    private MovieListAdapter movie_adapter;
+//    private ArrayList<Movie> demo_list;
+//    private MovieListAdapter demo_adapter;
 
     public MovieListFragment() {
     }
@@ -32,17 +31,53 @@ public class MovieListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         selected_index = position;
-//        getListView().setItemChecked(position, true);
-        movie_selection_listener.onMovieSelected(demo_adapter.getItem(position));
+        getListView().setItemChecked(position, true);
+//        movie_selection_listener.onMovieSelected(demo_adapter.getItem(position));
+        movie_selection_listener.onMovieSelected(movie_adapter.getItem(position));
+    }
+
+    public void update(ArrayList<Movie> retrievedMovies, boolean navListChanged) {
+        Log.d(TAG, "update()");
+
+        setListShown(true);
+
+        movie_list.clear();
+        movie_list.addAll(retrievedMovies);
+        movie_adapter.notifyDataSetChanged();
+
+        if (navListChanged) {                                                       // Select first item if showing different list
+            getListView().setItemChecked(selected_index, false);
+            selected_index = NO_INDEX;
+            getListView().setSelection(0);
+        } else if (movie_adapter.getCount() > 0 && selected_index != NO_INDEX) {     // If showing same list, restore selection
+            getListView().setItemChecked(selected_index, true);
+            getListView().setSelection(selected_index);
+            getListView().smoothScrollToPositionFromTop(selected_index, 200, 0);
+            movie_selection_listener.onMovieSelected(movie_adapter.getItem(selected_index));
+        }
+    }
+
+    /**
+     *
+     * @param retrievedMovie
+     */
+    public void update(Movie retrievedMovie) {
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        setListShown(true);
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        setListShown(true);
 
+        if (movie_adapter.getCount() > 0 && selected_index != NO_INDEX) {
+            getListView().setItemChecked(selected_index, true);
+            getListView().setSelection(selected_index);
+            getListView().smoothScrollToPositionFromTop(selected_index, 200, 0);
+            movie_selection_listener.onMovieSelected(movie_adapter.getItem(selected_index));
+        }
     }
 
     @Override
@@ -60,38 +95,46 @@ public class MovieListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        demo_list = new ArrayList<Movie>();
-        Movie m;
-        java.util.Random rand = new java.util.Random(System.currentTimeMillis());
-        byte[] b = new byte[256];
-        for (int i = 1; i <= 30; i++) {
-            m = new Movie();
-            m.title = "Hello World" + " " + i;
-            m.mpaa = "PG-" + i;
-            m.rating = i % 6;
-            rand.nextBytes(b);
-            m.description = new String(b);
-            demo_list.add(m);
+        // Restore selected index
+        if (savedInstanceState != null) {
+            selected_index = savedInstanceState.getInt("selected_index");
         }
 
-        selected_index = NO_INDEX;
+//        demo_list = new ArrayList<Movie>();
+//        Movie m;
+//        java.util.Random rand = new java.util.Random(System.currentTimeMillis());
+//        byte[] b = new byte[256];
+//        for (int i = 1; i <= 30; i++) {
+//            m = new Movie();
+//            m.title = "Hello World" + " " + i;
+////            m.mpaa = "PG-" + i;
+//            m.rating = i % 6;
+//            rand.nextBytes(b);
+//            m.description = new String(b);
+//            demo_list.add(m);
+//        }
+
+//        selected_index = NO_INDEX;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        demo_adapter = new MovieListAdapter(getActivity(), R.layout.movie_list_item, R.id.movie_title, demo_list);
-        getListView().setAdapter(demo_adapter);
+//        demo_adapter = new MovieListAdapter(getActivity(), R.layout.movie_list_item, R.id.movie_title, demo_list);
+//        getListView().setAdapter(demo_adapter);
+        movie_adapter = new MovieListAdapter(getActivity(), R.layout.movie_list_item, R.id.movie_title, movie_list, ((MovieBrowserActivity)getActivity()).getImageLoader());
+        getListView().setAdapter(movie_adapter);
 
         // Restore selected index
-        if (savedInstanceState != null) {
-            selected_index = savedInstanceState.getInt("selected_index");
-        }
+//        if (savedInstanceState != null) {
+//            selected_index = savedInstanceState.getInt("selected_index");
+//        }
 
-        if (selected_index != NO_INDEX) {
-            movie_selection_listener.onMovieSelected(demo_adapter.getItem(selected_index));
-        }
+//        if (selected_index != NO_INDEX) {
+////            movie_selection_listener.onMovieSelected(demo_adapter.getItem(selected_index));
+//            movie_selection_listener.onMovieSelected(movie_adapter.getItem(selected_index));
+//        }
     }
 
     @Override
