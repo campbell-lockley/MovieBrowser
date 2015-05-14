@@ -65,7 +65,7 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
         slidingPaneLayout.closePane();
     }
 
-    // onNavigationListener to handle the navigation list selections
+    // TODO: update: onNavigationListener to handle the navigation list selections
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String[] view_list = getResources().getStringArray(R.array.view_list);
@@ -197,7 +197,9 @@ public class MovieBrowserActivity extends ActionBarActivity implements AdapterVi
                 return true;
             case R.id.action_browser:
                 Log.d(TAG, "Browser selected");
-                Toast.makeText(getApplicationContext(), "Browser Selected", Toast.LENGTH_SHORT).show();
+                // Send intent to web browser if list item is selected
+                MovieListFragment movieListFragment = (MovieListFragment)fragmentManager.findFragmentByTag(MOVIE_LIST_FRAGMENT_TAG);
+                movieListFragment.gotoWebPage();
                 return true;
             case R.id.action_settings:
                 Log.d(TAG, "Settings selected");

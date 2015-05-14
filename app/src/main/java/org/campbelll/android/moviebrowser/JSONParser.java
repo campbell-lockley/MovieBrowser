@@ -29,7 +29,7 @@ public class JSONParser {
         movie.title = json_movie.optString("title");
 //        movie.mpaa = json_movie.optString("mpaa_rating");
         movie.id = json_movie.optString("id");
-        movie.homepage= BASE_HOMEPAGE_URL + movie.id;
+        movie.webpage = BASE_HOMEPAGE_URL + movie.id;
         movie.thumb_url = BASE_IMAGE_URL + IMAGE_FORMAT + json_movie.optString("poster_path");
 
 //        movie.description = json_movie.optString("synopsis");

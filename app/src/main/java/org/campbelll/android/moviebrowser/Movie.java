@@ -10,7 +10,7 @@ public class Movie {
     public int rating;
     public String thumb_url;
     public String description;
-    public String homepage;
+    public String webpage;
 
     public Movie() {
     }

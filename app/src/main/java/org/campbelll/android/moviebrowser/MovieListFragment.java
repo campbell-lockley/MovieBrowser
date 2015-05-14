@@ -2,11 +2,14 @@ package org.campbelll.android.moviebrowser;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 /**
@@ -57,12 +60,14 @@ public class MovieListFragment extends ListFragment {
         }
     }
 
-    /**
-     *
-     * @param retrievedMovie
-     */
-    public void update(Movie retrievedMovie) {
+    public void gotoWebPage() {
+        if (movie_adapter.getCount() > 0 && selected_index != NO_INDEX) {
+            Intent startBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(movie_adapter.getItem(selected_index).webpage));
 
+            if (startBrowser.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(startBrowser);
+            }
+        }
     }
 
     @Override
