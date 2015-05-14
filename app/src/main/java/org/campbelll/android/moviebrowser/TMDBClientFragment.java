@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 
-import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -16,11 +15,31 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONObject;
 
 /**
- * Created by campbell on 13/05/2015.
+ * Fragment works in background, sends api requests to themoviedb.org's api via the com.android.volley framework.
+ *
+ * This fragment persists beyond an activities lifetime, so the same fragment is used when the device rotates, etc.
+ *
+ * getMovieList(req_type) will request an entire list of either "now_playing" or "upcoming" movies.
+ * getMovieOverview(movie_id) will request the overview text for a given movie.
+ *
+ * getMovieList() is used to fill MovieListFragment's list with movie items.
+ * getMovieOverview() is used to update MovieDetailsFragment with the matching overview text when an item in
+ * MovieListFragment's list is selected.
+ *
+ * themoviedb.org's api does not supply a movie's overview text when "now_playing" or "upcoming" is requested, hence it
+ * must be fetched later for the MovieDetailsFragment.
+ *
+ * NOTE: the themoviedb.org api defaults to serving "page=1" on a "now_playing" or "upcoming" request. Fetching more
+ * pages with either api request is possible, but for the purposes of this app - especially as it is a 'demo' app - it
+ * was decided that only fetching the first page from the api would be sufficient.
+ *
+ * @author Campbell Lockley
+ *
  */
 public class TMDBClientFragment extends Fragment {
     private static final String TAG = "TMDBClientFragment";
 
+    /** TODO: comment */
     public static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     public static final String IN_THEATRES_URL = "now_playing";
     public static final String OPENING_URL = "upcoming";
@@ -36,6 +55,13 @@ public class TMDBClientFragment extends Fragment {
     public TMDBClientFragment() {
     }
 
+    /**
+     * Send api request to get list of "now_playing" or "upcoming" movies, setting the response handler to be the
+     * activity.
+     *
+     * @param req_type Must be either "In Theatres" to get the api's "now_playing" movie list, or "Opening" to get the
+     *                 api's "upcoming" movie list.
+     */
     public void getMovieList(String req_type) {
         String urlRequest;
         // Construct api call
@@ -67,6 +93,12 @@ public class TMDBClientFragment extends Fragment {
         requestQueue.add(request);
     }
 
+    /**
+     * Uses the api's movie_id to get the movie overview text for the corresponding movie, setting the response handler
+     * to be the activity.
+     *
+     * @param movie_id themoviedb.org api's id for the movie to request the overview for.
+     */
     public void getMovieOverview(String movie_id) {
         // Construct api call
         final String urlRequest = BASE_URL + movie_id + API_ARGS + API_KEY;
@@ -88,6 +120,7 @@ public class TMDBClientFragment extends Fragment {
         requestQueue.add(request);
     }
 
+    /** Set the activity to be the TMDBResponseListener */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -99,6 +132,7 @@ public class TMDBClientFragment extends Fragment {
         }
     }
 
+    /** Setup Volley.RequestQueue and Volley.toolbox.ImageLoader, and set fragment to persist beyond activity */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,12 +144,13 @@ public class TMDBClientFragment extends Fragment {
         setRetainInstance(true);
     }
 
+    /** Cancel all pending Volley network requests */
     public void cancelAllRequests() {
         requestQueue.cancelAll(this);
     }
 
+    /** Utility method to get ImageLoader */
     public ImageLoader getImageLoader() {
         return imageLoader;
     }
-
 }

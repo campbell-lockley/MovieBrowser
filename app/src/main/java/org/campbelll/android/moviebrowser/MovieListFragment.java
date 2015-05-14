@@ -9,11 +9,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
-import java.net.URI;
 import java.util.ArrayList;
 
 /**
- * Created by campbell on 12/05/2015.
+ * Fragment displays a list of movies which are obtained from themoviedb.org's web api. Works with MovieDetailsFragment
+ * in a sliding layout.
+ *
+ * Selecting a movie in MovieListFragment's list will display that movie's details in MovieDetailsFragment.
+ *
+ * @author Campbell Lockley
+ *
  */
 public class MovieListFragment extends ListFragment {
     private static final String TAG = "MovieListFragment";
@@ -25,20 +30,33 @@ public class MovieListFragment extends ListFragment {
 
     private ArrayList<Movie> movie_list = new ArrayList<>();
     private MovieListAdapter movie_adapter;
-//    private ArrayList<Movie> demo_list;
-//    private MovieListAdapter demo_adapter;
 
     public MovieListFragment() {
     }
 
+    /**
+     * Handles list items being selected.
+     *
+     * Uses MovieSelectionListener to update MovieDetailsFragment with the selected movie's details.
+     *
+     * @param l The ListView where the click happened
+     * @param v The view that was clicked within the ListView
+     * @param position The position of the view in the list
+     * @param id The row id of the item that was clicked
+     */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         selected_index = position;
         getListView().setItemChecked(position, true);
-//        movie_selection_listener.onMovieSelected(demo_adapter.getItem(position));
         movie_selection_listener.onMovieSelected(movie_adapter.getItem(position));
     }
 
+    /**
+     * Update MovieListFragment's list with the list of movies retrieved from themoviedb.org.
+     *
+     * @param retrievedMovies List of movies retrieved from themoviedb.org.
+     * @param navListChanged Whether the selected navigation list item has changed.
+     */
     public void update(ArrayList<Movie> retrievedMovies, boolean navListChanged) {
         Log.d(TAG, "update()");
 
@@ -48,11 +66,13 @@ public class MovieListFragment extends ListFragment {
         movie_list.addAll(retrievedMovies);
         movie_adapter.notifyDataSetChanged();
 
-        if (navListChanged) {                                                       // Select first item if showing different list
+        if (navListChanged) {
+            // Select first item if showing different list
             getListView().setItemChecked(selected_index, false);
             selected_index = NO_INDEX;
             getListView().setSelection(0);
-        } else if (movie_adapter.getCount() > 0 && selected_index != NO_INDEX) {     // If showing same list, restore selection
+        } else if (movie_adapter.getCount() > 0 && selected_index != NO_INDEX) {
+            // If showing same list, restore selection
             getListView().setItemChecked(selected_index, true);
             getListView().setSelection(selected_index);
             getListView().smoothScrollToPositionFromTop(selected_index, 200, 0);
@@ -60,9 +80,14 @@ public class MovieListFragment extends ListFragment {
         }
     }
 
+    /**
+     * Launches an intent to go to the web page of the currently selected movie in the list.
+     *
+     */
     public void gotoWebPage() {
         if (movie_adapter.getCount() > 0 && selected_index != NO_INDEX) {
-            Intent startBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(movie_adapter.getItem(selected_index).webpage));
+            Intent startBrowser = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(movie_adapter.getItem(selected_index).webpage));
 
             if (startBrowser.resolveActivity(getActivity().getPackageManager()) != null) {
                 startActivity(startBrowser);
@@ -70,6 +95,7 @@ public class MovieListFragment extends ListFragment {
         }
     }
 
+    /** Restore selection in list */
     @Override
     public void onResume() {
         super.onResume();
@@ -85,6 +111,7 @@ public class MovieListFragment extends ListFragment {
         }
     }
 
+    /** Set activity as the MovieSelectionListener */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -96,55 +123,29 @@ public class MovieListFragment extends ListFragment {
         }
     }
 
+    /** Restore currently selected index */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Restore selected index
         if (savedInstanceState != null) {
             selected_index = savedInstanceState.getInt("selected_index");
         }
-
-//        demo_list = new ArrayList<Movie>();
-//        Movie m;
-//        java.util.Random rand = new java.util.Random(System.currentTimeMillis());
-//        byte[] b = new byte[256];
-//        for (int i = 1; i <= 30; i++) {
-//            m = new Movie();
-//            m.title = "Hello World" + " " + i;
-////            m.mpaa = "PG-" + i;
-//            m.rating = i % 6;
-//            rand.nextBytes(b);
-//            m.description = new String(b);
-//            demo_list.add(m);
-//        }
-
-//        selected_index = NO_INDEX;
     }
 
+    /** Setup MovieListAdapter */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-//        demo_adapter = new MovieListAdapter(getActivity(), R.layout.movie_list_item, R.id.movie_title, demo_list);
-//        getListView().setAdapter(demo_adapter);
-        movie_adapter = new MovieListAdapter(getActivity(), R.layout.movie_list_item, R.id.movie_title, movie_list, ((MovieBrowserActivity)getActivity()).getImageLoader());
+        movie_adapter = new MovieListAdapter(getActivity(), R.layout.movie_list_item, R.id.movie_title, movie_list,
+                ((MovieBrowserActivity)getActivity()).getImageLoader());
         getListView().setAdapter(movie_adapter);
-
-        // Restore selected index
-//        if (savedInstanceState != null) {
-//            selected_index = savedInstanceState.getInt("selected_index");
-//        }
-
-//        if (selected_index != NO_INDEX) {
-////            movie_selection_listener.onMovieSelected(demo_adapter.getItem(selected_index));
-//            movie_selection_listener.onMovieSelected(movie_adapter.getItem(selected_index));
-//        }
     }
 
+    /** Save currently selected index */
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        // Save selected index
         outState.putInt("selected_index", selected_index);
         super.onSaveInstanceState(outState);
     }

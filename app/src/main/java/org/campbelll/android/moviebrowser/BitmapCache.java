@@ -7,9 +7,10 @@ import android.util.LruCache;
 import com.android.volley.toolbox.ImageLoader;
 
 /**
+ * Utility class; concrete implementation of ImageLoader.ImageCache for use in Volley's ImageLoader.
+ *
  * This code is adapted from org.stevej.android.propertyfinder.utils.BitmapCache
  *
- * Created by campbell on 13/05/2015.
  */
 public class BitmapCache extends LruCache<String, Bitmap> implements ImageLoader.ImageCache {
 
@@ -21,15 +22,16 @@ public class BitmapCache extends LruCache<String, Bitmap> implements ImageLoader
         super(getDefaultLruCacheSize());
     }
 
+    /** Returns cache size being an 1/8th of total heap size (if cached items are 1024 Bytes in size). */
     public static int getDefaultLruCacheSize() {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         final int cacheSize = maxMemory / 8;
         return cacheSize;
     }
 
+    /** Wrapper for LruCache.get(url) */
     public Bitmap getBitmap(String url) {
         Log.d("BitmapCache", "getBitmap : " + url);
-        // url = url.substring(url.indexOf("http"));
 
         Bitmap b = get(url);
         if (b != null) {
@@ -38,9 +40,9 @@ public class BitmapCache extends LruCache<String, Bitmap> implements ImageLoader
         return get(url);
     }
 
+    /** Wrapper for LruCache.put(url) */
     public void putBitmap(String url, Bitmap bitmap) {
         Log.d("BitmapCache", "putBitmap : " + url);
-        // url = url.substring(url.indexOf("http"));
 
         Log.d("BitmapCache", "putBitmap : " + bitmap.getWidth() + " x " + bitmap.getHeight());
         put(url, bitmap);
